@@ -42,6 +42,10 @@ services:
      - type: bind
        source: ./docker-bind/entrypoint.sh
        target: /sbin/entrypoint.sh
+     - type: bind
+       source: ./docker-bind/bind/bind/etc/named.conf.options
+       target: /data/bind/etc/named.conf.options
+
   bind-dnstap:
     image: mattjtodd/dnstap
     command: -j -u /var/run/tap/bind.sock -w /var/run/tap/bind.dnstap
