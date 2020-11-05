@@ -67,7 +67,21 @@ services:
   bind-c-dns:
     image: c-dns:20201029
     build: docker-c-dns/.
-    command: -c /etc/compactor.conf
+    command: -c /etc/compactor.conf --dns-port 73 --interface docker0 --interface eth0 --interface lo --interface br-1e3498ecdd3b --output /c-dns/%Y%m%d-%H%M%S_%{rotate-period}_%{interface}.bind.cdns --raw-pcap /c-dns/%Y%m%d-%H%M%S_%{rotate-period}_%{interface}.raw.bind.pcap
+    restart: always
+    network_mode: host
+    volumes:
+     - type: bind
+       source: ./output/c-dns
+       target: /c-dns
+     - type: bind
+       source: ./docker-c-dns/compactor.conf
+       target: /etc/compactor.conf
+
+  coredns-c-dns:
+    image: c-dns:20201029
+    build: docker-c-dns/.
+    command: -c /etc/compactor.conf --dns-port 63 --interface docker0 --interface eth0 --interface lo --interface br-1e3498ecdd3b --output /c-dns/%Y%m%d-%H%M%S_%{rotate-period}_%{interface}.coredns.cdns --raw-pcap /c-dns/%Y%m%d-%H%M%S_%{rotate-period}_%{interface}.raw.coredns.pcap
     restart: always
     network_mode: host
     volumes:
@@ -106,12 +120,6 @@ services:
     image: query-cannon:20201104
     build: docker-query-cannon/.
     # command: 
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 0
-        window: 120s
     volumes:
      - type: bind
        source: ./output/query-cannon
@@ -127,17 +135,6 @@ services:
 #     image: knot-utils:20201104
 #     build: docker-knot-utils/.
 #     # command: 
-#     deploy:
-#       restart_policy:
-#         condition: on-failure
-#         delay: 5s
-#         max_attempts: 0
-#         window: 120s
-#       resources:
-#         limits:
-#           memory: 8g
-#         reservations:
-#           memory: 4g
 #     volumes:
 #      - type: bind
 #        source: ./docker-knot-utils
@@ -147,6 +144,70 @@ services:
 #     #   memlock: -1
 #         # soft: 9999
 #         # hard: 9999
+
+#ELK with Packbeat
+  packetbeat:
+    image: docker.elastic.co/beats/packetbeat-oss:7.9.3
+    #command: setup -E setup.kibana.host=127.0.0.1:5601 # - this only needs to run the first time
+    environment: 
+      - output.elasticsearch.hosts=["127.0.0.1:9200"] 
+    cap_add:
+      - ALL
+    network_mode: host
+    volumes:
+      - type: bind
+        source: ./docker-elk/packetbeat.yml
+        target: /usr/share/packetbeat/packetbeat.yml
+    depends_on:
+      - elasticsearch
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.9.3
+    ports:
+      - "9200:9200/tcp"
+    environment: 
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - cluster.name=dnsmetricslab
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - type: bind
+        source: ./docker-elk/data
+        target: /usr/share/elasticsearch/data
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana-oss:7.9.3
+    ports:
+      - "5601:5601/tcp"
+    environment:
+      - SERVER_HOST=0.0.0.0
+      - SERVER_PORT=5601
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - KIBANA_AUTOCOMPLETETIMEOUT=3000
+      - KIBANA_AUTOCOMPLETETERMINATEAFTER=2500000
+      - LOGGING_QUIET=false
+      - LOGGING_DEST=stdout
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash-oss:7.9.3
+    volumes:
+      - type: bind
+        source: ./output/tshark
+        target: /tshark
+      - type: bind
+        source: ./docker-elk/logstash.conf
+        target: /usr/share/logstash/pipeline/logstash.conf
+
+  tshark:
+    image: toendeavour/tshark
+    volumes:
+     - type: bind
+       source: ./output/c-dns
+       target: /pcap
+     
 
 secrets:
   corefile:

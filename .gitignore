@@ -4,4 +4,6 @@ output/logs/*
 output/pcap/*
 output/query-cannon/*
 output/tap/*
+output/tshark/*
 docker-c-dns-presenter/data/*
+docker-elk/data

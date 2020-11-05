@@ -9,9 +9,17 @@ mkdir -p ./output/c-dns
 mkdir -p ./output/logs/bind
 mkdir -p ./output/pcap
 mkdir -p ./output/tap
+mkdir -p ./output/es
 mkdir -p ./docker-bind/bind
-chown 101 -R ./output/logs/bind
-chown 101 -R ./docker-bind/bind
+mkdir -p ./docker-elk/data
+sudo chown 101 -R ./output/logs/bind
+sudo chown 101 -R ./docker-bind/bind
+sudo sysctl -w vm.max_map_count=262144
+```
+
+After containers launched comment this line out of docker-compose.yml
+```
+    command: setup -E setup.kibana.host=127.0.0.1:5601 # - this only needs to run the first time
 ```
 
 
@@ -28,12 +36,6 @@ chown 101 -R ./docker-bind/bind
 Query port 63
 ```
 dig google.com @localhost -p 63
-```
-
-## Setup
-Make sure that output/logs/bind is owned by user 101
-```
-chown 101 output/logs/bind
 ```
 
 ## Run
@@ -121,4 +123,77 @@ libbpf: failed to load object '7fa7fe9aa040-698'
 failed to initialize XDP socket#0: program not loaded
 
 total queries: 0 (0 pps)
+```
+
+## ELK Presenter
+### References
+https://www.elastic.co/blog/analyzing-network-packets-with-wireshark-elasticsearch-and-kibana
+
+
+### Convert pcap to elasticsearch json manually
+
+Suck in ./output/pcap/20201105-050340_300_eth0.raw.pcap
+Output to ./output/es/test.json
+
+```
+sudo /usr/local/bin/docker-compose run --entrypoint 'tshark' tshark -r /pcap/20201105-050340_300_eth0.raw.pcap -T ek > output/tshark/packets.json
+```
+
+### Input pcap into elasticsearch
+Logstash is configured to look in the ./output/tshark folder and pickup any json files
+
+
+### Elasticsearch Index Pattern
+NEED TO FIGURE OUT HOW TO DO THIS
+
+```
+curl -X PUT "localhost:9200/_template/packets?pretty" -H 'Content-Type: application/json' -d'
+{
+  "template": "packets-*",
+  "mappings": {
+    "pcap_file": {
+      "dynamic": "false",
+      "properties": {
+        "timestamp": {
+          "type": "date"
+        },
+        "layers": {
+          "properties": {
+            "frame": {
+              "properties": {
+                "frame_frame_len": {
+                  "type": "text"
+                },
+                "frame_frame_protocols": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "ip": {
+              "properties": {
+                "ip_ip_src": {
+                  "type": "ip"
+                },
+                "ip_ip_dst": {
+                  "type": "ip"
+                }
+              }
+            },
+            "udp": {
+              "properties": {
+                "udp_udp_srcport": {
+                  "type": "integer"
+                },
+                "udp_udp_dstport": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+'
 ```
