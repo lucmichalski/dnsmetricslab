@@ -10,7 +10,8 @@ mkdir -p ./output/logs/bind
 mkdir -p ./output/pcap
 mkdir -p ./output/tap
 mkdir -p ./docker-bind/bind
-chown 101 ./output/logs/bind
+chown 101 -R ./output/logs/bind
+chown 101 -R ./docker-bind/bind
 ```
 
 
