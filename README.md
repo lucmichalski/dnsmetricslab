@@ -1,5 +1,17 @@
 # DNS Metrics Lab
 
+## Setup
+```
+mkdir -p ./dnsmetricslab/output/logs/bind
+mkdir -p ./dnsmetricslab/output/query-cannon
+mkdir -p ./dnsmetricslab/output/c-dns
+mkdir -p ./dnsmetricslab/output/logs/bind
+mkdir -p ./dnsmetricslab/output/pcap
+mkdir -p ./dnsmetricslab/output/tap
+mkdir -p ./dnsmetricslab/docker-bind/bind
+```
+
+
 ## DNS Daemons Listeners
 63 = Coredns
 73 = Bind
