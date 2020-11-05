@@ -4,5 +4,4 @@ output/logs/*
 output/pcap/*
 output/query-cannon/*
 output/tap/*
-docker-bind/bind
 docker-c-dns-presenter/data/*

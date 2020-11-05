@@ -1,0 +1,9 @@
+$ttl 38400
+test.audns.net.au.	IN	SOA	473757bbf168.ap-southeast-2.compute.internal. test.test.audns.net.au (
+			1603170246
+			10800
+			3600
+			604800
+			38400 )
+test.audns.net.au.	IN	NS	473757bbf168.ap-southeast-2.compute.internal.
+1.test.audns.net.au.	IN	A	8.8.8.8

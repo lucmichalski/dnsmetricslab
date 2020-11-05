@@ -1,0 +1,84 @@
+logging {
+        channel ns_syslog {
+                syslog daemon;
+                severity info;
+        };
+
+        channel ns_log {
+                file "/var/named/log/named.log" versions 3 size 100M;
+                severity dynamic;
+                print-time yes;
+                print-severity yes;
+                print-category yes;
+        };
+
+        channel ns_querylog {
+                file "/var/named/log/queries.log" versions 5 size 1G;
+                severity dynamic;
+                print-time yes;
+                print-severity yes;
+                print-category yes;
+        };
+
+        channel ns_debuglog {
+                file "/var/named/log/debug.log" versions 10 size 100M;
+                severity debug;
+                print-time yes;
+                print-severity yes;
+                print-category yes;
+        };
+
+        channel ns_auditlog {
+                file "/var/named/log/audit.log" versions 10 size 100M;
+                severity dynamic;
+                print-time yes;
+                print-severity yes;
+                print-category yes;
+        };
+
+        channel ns_xferlog {
+                file "/var/named/log/xfer.log" versions 10 size 100M;
+                severity dynamic;
+                print-time yes;
+                print-severity yes;
+                print-category yes;
+        };
+
+        channel ns_dnsseclog {
+                file "/var/named/log/dnssec.log" versions 10 size 100M;
+                severity dynamic;
+                print-time yes;
+                print-severity yes;
+                print-category yes;
+        };
+
+        channel ns_catchalllog {
+                file "/var/named/log/catchall.log" versions 10 size 100M;
+                severity dynamic;
+                print-time yes;
+                print-severity yes;
+                print-category yes;
+        };
+
+        category default        { ns_log; };
+        category general        { ns_log; };
+        category database       { ns_catchalllog; };
+        category security       { ns_log; };
+        category config         { ns_log; };
+        category resolver       { ns_auditlog; };
+        category xfer-in        { ns_xferlog; };
+        category xfer-out       { ns_xferlog; };
+        category notify         { ns_auditlog; };
+        category client         { ns_auditlog; };
+        category unmatched      { ns_catchalllog; };
+        category network        { ns_auditlog; };
+        category update         { ns_auditlog; };
+        category update-security{ ns_catchalllog; };
+        category queries        { ns_querylog; };
+        category query-errors   { ns_catchalllog; };
+        category dispatch       { ns_auditlog; };
+        category dnssec         { ns_dnsseclog; };
+        category lame-servers   { ns_auditlog; };
+        category delegation-only{ ns_catchalllog; };
+        category edns-disabled   { ns_catchalllog; };
+};
