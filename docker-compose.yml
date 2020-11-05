@@ -67,7 +67,7 @@ services:
   bind-c-dns:
     image: c-dns:20201029
     build: docker-c-dns/.
-    command: -c /etc/compactor.conf --dns-port 73 --interface docker0 --interface eth0 --interface lo --interface br-1e3498ecdd3b --output /c-dns/%Y%m%d-%H%M%S_%{rotate-period}_%{interface}.bind.cdns --raw-pcap /c-dns/%Y%m%d-%H%M%S_%{rotate-period}_%{interface}.raw.bind.pcap
+    command: -c /etc/compactor.conf --dns-port 73 --interface docker0 --interface eth0 --interface lo --output /c-dns/%Y%m%d-%H%M%S_%{rotate-period}_%{interface}.bind.cdns --raw-pcap /c-dns/%Y%m%d-%H%M%S_%{rotate-period}_%{interface}.raw.bind.pcap
     restart: always
     network_mode: host
     volumes:
@@ -81,7 +81,7 @@ services:
   coredns-c-dns:
     image: c-dns:20201029
     build: docker-c-dns/.
-    command: -c /etc/compactor.conf --dns-port 63 --interface docker0 --interface eth0 --interface lo --interface br-1e3498ecdd3b --output /c-dns/%Y%m%d-%H%M%S_%{rotate-period}_%{interface}.coredns.cdns --raw-pcap /c-dns/%Y%m%d-%H%M%S_%{rotate-period}_%{interface}.raw.coredns.pcap
+    command: -c /etc/compactor.conf --dns-port 63 --interface docker0 --interface eth0 --interface lo --output /c-dns/%Y%m%d-%H%M%S_%{rotate-period}_%{interface}.coredns.cdns --raw-pcap /c-dns/%Y%m%d-%H%M%S_%{rotate-period}_%{interface}.raw.coredns.pcap
     restart: always
     network_mode: host
     volumes:
@@ -148,7 +148,7 @@ services:
 #ELK with Packbeat
   packetbeat:
     image: docker.elastic.co/beats/packetbeat-oss:7.9.3
-    #command: setup -E setup.kibana.host=127.0.0.1:5601 # - this only needs to run the first time
+    command: setup -E setup.kibana.host=127.0.0.1:5601 # - this only needs to run the first time
     environment: 
       - output.elasticsearch.hosts=["127.0.0.1:9200"] 
     cap_add:

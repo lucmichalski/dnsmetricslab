@@ -10,6 +10,7 @@ mkdir -p ./output/logs/bind
 mkdir -p ./output/pcap
 mkdir -p ./output/tap
 mkdir -p ./output/es
+mkdir -p ./output/tshark
 mkdir -p ./docker-bind/bind
 mkdir -p ./docker-elk/data
 sudo chown 101 -R ./output/logs/bind
