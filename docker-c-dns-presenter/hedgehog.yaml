@@ -1,0 +1,15 @@
+database:
+    host : bind-c-dns-presenter-db
+    # host : /var/run/postgresql # specify a host for the postgresql DB. If
+    # this begins with a slash, it specifies the
+    # directory in which the socket file is
+    # stored.
+    port : 5432 # specify port for the postgresql DB.
+    name : hedgehog # specify dbname for the postgresql DB.
+    owner : hedgehog # specify a user to own the postgresql DB.
+    # [Required for Data Manager component]
+    owner_pass : QATyXpkzAak8q43sm3K1 # specify a password for the owner user if needed.
+    read_user : hedgehog # specify a read user for the postgresql DB.
+    # [Required for Web front-end component]
+    read_pass : QATyXpkzAak8q43sm3K1 # specify a password for the read user if needed.
+   

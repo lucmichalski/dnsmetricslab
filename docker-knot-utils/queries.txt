@@ -1,0 +1,6 @@
+abc6.example.com. AAAA
+nxdomain.example.com. A
+notzone. A
+a.example.com. NS E
+ab.example.com. A D
+abcd.example.com. DS D

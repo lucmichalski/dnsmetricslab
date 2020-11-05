@@ -1,0 +1,112 @@
+acl internal {
+             10.0.0.0/8;
+             192.168.0.0/16;
+};
+
+// All options configured as per 9.11.4
+options {
+        directory                   "/var/named";
+        statistics-file             "/var/named/data/named_stats.txt";
+        memstatistics-file          "/var/named/data/named_mem_stats.txt";
+        acache-cleaning-interval    60;                               // minutes ; [Opt, View]
+        acache-enable               yes;                              //(yes | no) ;
+        additional-from-auth        no;                               //(yes | no) ; [ Opt, View ]
+        additional-from-cache       no;                               //(yes | no) ; [ Opt, View ]
+        allow-new-zones             no;                               //(yes | no) ;
+        allow-notify                { none; };                        //{ address_match_list }; [ Opt, View, Zone ]
+        allow-query                 { localhost; internal; };         // auDA sets per zone. { address_match_list }; [ Opt, View, Zone ]
+        allow-query-on              { any; };                         // auDA sets per zone. { address_match_list }; [ Opt, View, Zone ]
+        allow-query-cache           { any; };                        //{ address_match_list }; [ Opt, View ]
+        allow-query-cache-on        { any; };                        //{ address_match_list }; [ Opt, View ]
+        allow-recursion             { any; };                        //{ address_match_list }; [ Opt, View ]
+        allow-recursion-on          { any; };                        //{ address_match_list }; [ Opt, View ]
+        allow-transfer              { none; };                        //{ address_match_list }; [ Opt, View, Zone]
+        allow-update                { none; };                        //{ address_match_list }; [Opt, View, Zone]
+        allow-update-forwarding     { none; };                        //{ address_match_list }; [ Opt, View, Zone]
+        also-notify                 { none; };                        // auDA sets per zone.  { IP_address [port port ] [dscp ip_dscp] [key keyname] ; [IP_address [port port] [dscp ip_dscp] [key keyname] ; };
+        auth-nxdomain               no;                               //(yes | no); [ Opt, View ]
+        check-names                 slave fail;                       //( master | slave | response ) ( fail | warn | ignore ); [ Opt, view ]
+        cleaning-interval           60;                               //number; [ Opt, View ]
+        dialup                      no;                               //dialup_options; [ Opt, View, Zone ]
+        dnssec-enable               yes;                              //( yes | no ); [ Opt, View ]
+        dnssec-lookaside            no;                               //domain trust-anchor domain; [ Opt, View ]
+        dnssec-validation           yes;                              //( yes | no ); [ Opt, View ]
+        edns-udp-size               4096;                             //size_in_bytes; [ Opt, View ]
+        empty-zones-enable          yes;                              //yes | no; [ Opt, View ]
+        hostname                    "localhost";                      //hostname_string; ; [ Opt, View ]
+        interface-interval          60;                               //number; [ Opt ]
+        ixfr-from-differences       yes;                              //( yes | no); [ Opt, View, Zone ]
+        listen-on                   port 53 { any; };                 //[ port ip_port ] { address_match_list }; [Opt, lwres ]
+        listen-on-v6                { none; };                        //[ port ip_port ] { address_match_list }; [ Opt ]
+        masterfile-format           text;                             //(text|raw|map); [ Opt, View, Zone ]
+        max-journal-size            1073741824;                       //size_in_bytes; [ Opt, View, Zone ]
+        max-ncache-ttl              3600;                             //seconds; [ Opt, View ]
+        max-transfer-idle-in        60;                               //minutes; [ Opt, View, Zone ]
+        max-transfer-time-in        120;                              //minutes; [ Opt, View, Zone ]
+        minimal-responses           yes;                              //( yes | no ) ; [ Opt, View ]
+        multi-master                no;                               //( yes | no ) ; [ Opt, View, Zone ]
+        notify                      no;                               //( yes | no | explicit ); [ Opt, View, Zone ]
+        pid-file                    "/var/run/named/named.pid";       //"path_to_file"; [ Opt ]
+        preferred-glue              A;                                //( A | AAAA) ; [ Opt, View ]
+        querylog                    yes;                              //( yes | no ); [ Opt ]
+        rate-limit                  {
+                                    responses-per-second 5;           //[ responses-per-second [size number] [ratio fixedpoint] number ; ]
+                                    referrals-per-second 5;           //[ referrals-per-second number ; ]
+                                    nodata-per-second 5;              //[ nodata-per-second number ; ]
+                                    nxdomains-per-second 5;           //[ nxdomains-per-second number ; ]
+                                    errors-per-second 5;              //[ errors-per-second number ; ]
+                                    all-per-second 20;                //[ all-per-second number ; ]
+                                    window 15;                        //[ window number ; ]
+                                    log-only no;                      //[ log-only yes_or_no ; ]
+                                    ipv4-prefix-length 32;            //[ ipv4-prefix-length number ; ]
+                                    ipv6-prefix-length 56;            //[ ipv6-prefix-length number ; ]
+                                    slip 2;                           //[ slip number ; ]                                  
+                                    max-table-size 20000;             //[ max-table-size number ; ]
+                                    min-table-size 500;               //[ min-table-size number ; ]
+                                    exempt-clients { 127.0.0.1; cloudflare; };                                                  
+                                    };                                //[ opt, View ]
+        recursion                   yes;                               //( yes | no ); [ Opt, View ]
+        request-ixfr                yes;                              //( yes | no ); [ Opt, View, server ]
+        serial-query-rate           20;                               //number; [ Opt ]
+        server-id                   "nsid-hostname";                  //server-id "server_id"; [ Opt ]
+        sig-validity-interval       90 89;                            //days ; [ Opt, View, Zone ]
+        tcp-clients                 100;                              //number; [ Opt ]
+        tcp-listen-queue            3;                                //number; [ Opt ]
+        transfer-format             many-answers;                     //( one-answer | many-answers ); [ Opt, View, server ]
+        transfers-in                10;                               //number; [ Opt ]
+        transfers-out               10;                               //number; [ Opt ]
+        transfers-per-ns            5;                                //number; [ Opt ]
+        use-alt-transfer-source     no;                               //( yes | no ); [ Opt, View, Zone ]
+        version                     "Unavailable.";                   //version_string; [ Opt ]
+        zone-statistics             yes;                              //( yes | no ) ; [ Opt, View, Zone ]
+
+};
+
+
+logging {
+     category default { default_stderr;  };
+     category config { default_stderr;  };
+     category dispatch { default_stderr;  };
+     category network { default_stderr;  };
+     category general { default_stderr;  };
+     category resolver { default_stderr;   };
+     category cname { default_stderr;   };
+     category delegation-only { default_stderr;   };
+     category lame-servers { default_stderr;   };
+     category edns-disabled { default_stderr;   };
+     category dnssec { default_stderr;   };
+     category notify { default_stderr;   };
+     category xfer-in { default_stderr;   };
+     category xfer-out { default_stderr;   };
+     category update{ default_stderr;   };
+     category update-security { default_stderr;   };
+     category client{ default_stderr;   };
+     category security { default_stderr;   };
+     category rate-limit { default_stderr;   };
+     category spill { default_stderr;   };
+     category database { default_stderr;   };
+     category rpz { default_stderr;   };
+     category dnstap { default_stderr;   };
+     category queries { default_stderr;  };
+     category query-errors { default_stderr;  };
+};
