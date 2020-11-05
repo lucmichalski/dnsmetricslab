@@ -1,14 +1,16 @@
 # DNS Metrics Lab
 
 ## Setup
+run these commands from inside dnsmetricslab folder
 ```
-mkdir -p ./dnsmetricslab/output/logs/bind
-mkdir -p ./dnsmetricslab/output/query-cannon
-mkdir -p ./dnsmetricslab/output/c-dns
-mkdir -p ./dnsmetricslab/output/logs/bind
-mkdir -p ./dnsmetricslab/output/pcap
-mkdir -p ./dnsmetricslab/output/tap
-mkdir -p ./dnsmetricslab/docker-bind/bind
+mkdir -p ./output/logs/bind
+mkdir -p ./output/query-cannon
+mkdir -p ./output/c-dns
+mkdir -p ./output/logs/bind
+mkdir -p ./output/pcap
+mkdir -p ./output/tap
+mkdir -p ./docker-bind/bind
+chown 101 ./output/logs/bind
 ```
 
 
