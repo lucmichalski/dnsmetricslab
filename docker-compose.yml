@@ -167,7 +167,7 @@ services:
       - "9200:9200/tcp"
     environment: 
       - discovery.type=single-node
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
       - cluster.name=dnsmetricslab
     ulimits:
       nofile:
