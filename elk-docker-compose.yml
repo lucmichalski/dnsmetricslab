@@ -2,22 +2,22 @@ version: "3.7"
 
 services:
 
-  packetbeat:
-    image: docker.elastic.co/beats/packetbeat:7.9.3
-    # entrypoint: ["/bin/bash", "-c", "chmod go-w /usr/share/packetbeat/packetbeat.yml; /usr/local/bin/docker-entrypoint"]
-    command: setup -E setup.kibana.host=127.0.0.1:5601 # - this only needs to run the first time
-    environment: 
-      - output.elasticsearch.hosts=["127.0.0.1:9200"] 
-    cap_add:
-      - ALL
-    network_mode: host
-    volumes:
-      - type: bind
-        source: ./docker-elk/packetbeat.yml
-        target: /usr/share/packetbeat/packetbeat.yml
-        read_only: true
-    depends_on:
-      - elasticsearch
+  # packetbeat:
+  #   image: docker.elastic.co/beats/packetbeat:7.9.3
+  #   # entrypoint: ["/bin/bash", "-c", "chmod go-w /usr/share/packetbeat/packetbeat.yml; /usr/local/bin/docker-entrypoint"]
+  #   command: setup -E setup.kibana.host=127.0.0.1:5601 # - this only needs to run the first time
+  #   environment: 
+  #     - output.elasticsearch.hosts=["127.0.0.1:9200"] 
+  #   cap_add:
+  #     - ALL
+  #   network_mode: host
+  #   volumes:
+  #     - type: bind
+  #       source: ./docker-elk/packetbeat.yml
+  #       target: /usr/share/packetbeat/packetbeat.yml
+  #       read_only: true
+  #   depends_on:
+  #     - elasticsearch
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.9.3

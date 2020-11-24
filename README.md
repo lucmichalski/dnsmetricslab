@@ -20,6 +20,8 @@ Start ELK Containers
 docker-compose -f elk-docker-compose.yml up -d
 ```
 
+## Login to ELK
+http://localhost:5601/
 
 
 
