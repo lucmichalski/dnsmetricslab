@@ -17,6 +17,8 @@ services:
     #     read_only: true
     depends_on:
       - elasticsearch
+      - kibana
+      - logstash
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.9.3

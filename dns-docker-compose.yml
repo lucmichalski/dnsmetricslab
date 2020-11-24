@@ -28,7 +28,7 @@ services:
     entrypoint: ["/bin/bash", "-c", "chown 101 -R /var/named/log; chown 101 -R /data; /sbin/entrypoint.sh"]
     restart: always
     image: sameersbn/bind:9.16.1-20200524
-    network_mode: host
+    # network_mode: host
     ports:
      - "53:53/udp"
     volumes:
@@ -147,12 +147,12 @@ services:
 #         # soft: 9999
 #         # hard: 9999
 
-#   tshark:
-#     image: toendeavour/tshark
-#     volumes:
-#      - type: bind
-#        source: ./output/c-dns
-#        target: /pcap
+  tshark:
+    image: toendeavour/tshark
+    volumes:
+     - type: bind
+       source: ./output/c-dns
+       target: /pcap
      
 
 # secrets:

@@ -40,7 +40,7 @@ docker-compose f elk-docker-compose.yml up -d
 53 = Bind
 
 ## Fire Cannon at 53
-docker-compose run --entrypoint '/bin/bash -c' query-cannon 'cd /query-cannon/.env/bin/ && ./qcan fire -v localhost para www.google.com 5 2'
+docker-compose -f dns-docker-compose.yml run --entrypoint '/bin/bash -c' query-cannon 'cd /query-cannon/.env/bin/ && ./qcan fire -v 127.0.0.1 para www.google.com 5 2'
 
 
 ## DNS Tap Output
@@ -50,12 +50,12 @@ docker-compose run --entrypoint '/bin/bash -c' query-cannon 'cd /query-cannon/.e
 ## Query non standard Port
 Query port 63
 ```
-dig google.com @localhost -p 63
+dig google.com @127.0.0.1 -p 63
 ```
 
 ## Run
 ```
-docker-compose up
+docker-compose -f dns-docker-compose.yml up -d
 ```
 
 
@@ -96,7 +96,7 @@ d3464a1aa572        corfr/tcpdump                    "/usr/sbin/tcpdump -…"   
 
 Run the cannon against a single URL
 ```
-[ec2-user@ip-10-202-1-186 dnsmetrics]$ sudo /usr/local/bin/docker-compose run --entrypoint '/bin/bash -c' query-cannon 'cd /query-cannon/.env/bin/ && ./qcan fire -v 172.22.0.3 para www.google.com 5 2'
+[ec2-user@ip-10-202-1-186 dnsmetrics]$ docker-compose -f dns-docker-compose.yml run --entrypoint '/bin/bash -c' query-cannon 'cd /query-cannon/.env/bin/ && ./qcan fire -v 127.0.0.1 para www.google.com 5 2'
 WARNING: Some services (query-cannon) use the 'deploy' key, which will be ignored. Compose does not support 'deploy' configuration - use `docker stack deploy` to deploy to a swarm.
 Making 10 query/ies. Across 2 process/es.
 2020-11-04 05:31:18,413 INFO services.py:1164 -- View the Ray dashboard at http://127.0.0.1:8265
@@ -116,7 +116,7 @@ Making 10 query/ies. Across 2 process/es.
 
 Run the cannon against a list or URL's
 ```
-$ sudo /usr/local/bin/docker-compose run --entrypoint '/bin/bash -c' query-cannon 'cd /query-cannon/.env/bin/ && ./qcan fire -v 172.22.0.3 urlpara /etc/queries.txt 5 2'
+$  docker-compose -f dns-docker-compose.yml run --entrypoint '/bin/bash -c' query-cannon 'cd /query-cannon/.env/bin/ && ./qcan fire -v 172.22.0.3 urlpara /etc/queries.txt 5 2'
 ``` 
 
 ### kxdpgun
@@ -151,7 +151,7 @@ Suck in ./output/pcap/20201105-050340_300_eth0.raw.pcap
 Output to ./output/es/test.json
 
 ```
-sudo /usr/local/bin/docker-compose run --entrypoint 'tshark' tshark -r /pcap/20201105-050340_300_eth0.raw.pcap -T ek > output/tshark/packets.json
+docker-compose -f dns-docker-compose.yml run --entrypoint 'tshark' tshark -r /pcap/20201105-050340_300_eth0.raw.pcap -T ek > output/tshark/packets.json
 ```
 
 ### Input pcap into elasticsearch
