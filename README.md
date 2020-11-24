@@ -14,18 +14,12 @@ sudo sysctl -w vm.max_map_count=262144
 
 
 ## Setup ELK
-You will need to uncomment ELK containers if you would like these to run.
 
-If running ELK then after containers launched for first time comment this line out of docker-compose.yml
+Start ELK Containers
 ```
-    command: setup -E setup.kibana.host=127.0.0.1:5601 # - this only needs to run the first time
+docker-compose -f elk-docker-compose.yml up -d
 ```
 
-And then do a down/up
-```
-docker-compose down
-docker-compose up -d
-```
 
 
 
@@ -37,12 +31,12 @@ docker-compose up -d
 ### query cannon - https://github.com/aredmond/query-cannon
 Single URL
 ```
-docker-compose run --entrypoint '/bin/bash -c' query-cannon 'cd /query-cannon/.env/bin/ && ./qcan fire -v 127.0.0.1 para www.google.com 5 2'
+docker-compose -f dns-docker-compose.yml run --entrypoint '/bin/bash -c' query-cannon 'cd /query-cannon/.env/bin/ && ./qcan fire -v 127.0.0.1 para www.google.com 5 2'
 ```
 
 Fire at list of URL's from docker-query-cannon/queries.txt
 ```
-docker-compose run --entrypoint '/bin/bash -c' query-cannon 'cd /query-cannon/.env/bin/ && ./qcan fire -v 127.0.0.1 urlpara /etc/queries.txt 5 2'
+docker-compose -f dns-docker-compose.yml run --entrypoint '/bin/bash -c' query-cannon 'cd /query-cannon/.env/bin/ && ./qcan fire -v 127.0.0.1 urlpara /etc/queries.txt 5 2'
 
 ```
 
@@ -58,5 +52,10 @@ dig google.com @localhost -p 63
 
 ## Run
 ```
-docker-compose up
+docker-compose -f dns-docker-compose.yml up -d
+```
+
+## Stop
+```
+docker-compose -f dns-docker-compose.yml down -d
 ```

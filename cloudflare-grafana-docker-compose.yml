@@ -1,0 +1,34 @@
+version: "3.7"
+
+services:
+
+  mysql:
+    image: mysql:5
+    # network_mode: host
+    # volumes:
+    #   - type: bind
+    #     source: /home/ec2-user/zabbix/data
+    #     target: /var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=vgBbr12mIaVEvU0IyqDV
+      - MYSQL_DATABASE=grafana
+      - MYSQL_USER=grafana
+      - MYSQL_PASSWORD=RsrXgcLlrjvBsWijMKx0
+
+  cloudflare-grafana:
+    restart: always
+    image: grafana/grafana:latest
+    # image: grafana/grafana:latest-ubuntu
+
+    # network_mode: host
+    ports:
+     - "3000:3000/tcp"
+    environment:
+     - GF_INSTALL_PLUGINS=cloudflare-app
+     - GF_SERVER_PROTOCOL=http
+     - GF_DATABASE_HOST=mysql
+     - GF_DATABASE_USER=grafana
+     - GF_DATABASE_NAME=grafana
+     - GF_DATABASE_TYPE=mysql
+     - GF_DATABASE_PASSWORD=RsrXgcLlrjvBsWijMKx0
+     - GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=cloudflare-app-datasource,cloudflare-app

@@ -9,19 +9,30 @@ sudo sysctl -w vm.max_map_count=262144
 
 
 ## Setup ELK
-You will need to uncomment ELK containers if you would like these to run.
 
-If running ELK then after containers launched for first time comment this line out of docker-compose.yml
+Start ELK Containers
 ```
-    command: setup -E setup.kibana.host=127.0.0.1:5601 # - this only needs to run the first time
+docker-compose -f elk-docker-compose.yml up -d
+```
+
+## Setup Packetbeat
+You will need to uncomment ELK containers if you would like this to run.
+
+If running ELK then after containers launched for first time comment this line out of elk-docker-compose.yml
+```
+    command: setup -E setup.kibana.host=127.0.0.1:5601 # - this only needs to run the first time - LINE ~#7
+```
+
+NOTE: There is still an issue with changing permissions of the yml file.  This command does not work.
+```
+chmod go-w /usr/share/packetbeat/packetbeat.yml
 ```
 
 And then do a down/up
 ```
-docker-compose down
-docker-compose up -d
+docker-compose f elk-docker-compose.yml down
+docker-compose f elk-docker-compose.yml up -d
 ```
-
 
 
 ## DNS Daemons Listeners

@@ -1,0 +1,161 @@
+version: "3.7"
+
+services:
+
+#COREDNS
+  # coredns:
+  #   image: coredns/coredns
+  #   command: -conf /root/Corefile
+  #   restart: always    
+  #   secrets:
+  #     - source: corefile
+  #       target: /root/Corefile
+  #   ports:
+  #     - "63:53/udp"
+  # coredns-dnstap:
+  #   image: mattjtodd/dnstap
+  #   build: docker-coredns/.
+  #   command: -j -l 0.0.0.0:8053 -w /var/run/tap/coredns.dnstap
+  #   restart: always
+  #   network_mode: service:coredns
+  #   volumes:
+  #    - type: bind
+  #      source: ./output/tap
+  #      target: /var/run/tap
+
+#BIND
+  bind:
+    entrypoint: ["/bin/bash", "-c", "chown 101 -R /var/named/log; chown 101 -R /data; /sbin/entrypoint.sh"]
+    restart: always
+    image: sameersbn/bind:9.16.1-20200524
+    network_mode: host
+    ports:
+     - "53:53/udp"
+    volumes:
+     - type: bind
+       source: ./output/logs/bind
+       target: /var/named/log
+     - type: bind
+       source: ./docker-bind/bind
+       target: /data
+     - type: bind
+       source: ./output/tap
+       target: /var/run/tap
+     - type: bind
+       source: ./docker-bind/entrypoint.sh
+       target: /sbin/entrypoint.sh
+
+  # bind-dnstap:
+  #   image: mattjtodd/dnstap
+  #   command: -j -u /var/run/tap/bind.sock -w /var/run/tap/bind.dnstap
+  #   restart: always
+  #   volumes:
+  #    - type: bind
+  #      source: ./output/tap
+  #      target: /var/run/tap
+
+#PCAP 
+  bind-pcap:
+    image: corfr/tcpdump
+    command: -n -i any udp dst port 63 or udp dst port 53 -w /pcap/bind.pcap
+    restart: always
+    network_mode: host
+    volumes:
+     - type: bind
+       source: ./output/pcap
+       target: /pcap
+
+#C-DNS
+  bind-c-dns:
+    image: c-dns:20201029
+    build: docker-c-dns/.
+    command: -c /etc/compactor.conf --dns-port 53 --interface docker0 --interface eth0 --interface lo --output /c-dns/%Y%m%d-%H%M%S_%{rotate-period}_%{interface}.bind.cdns --raw-pcap /c-dns/%Y%m%d-%H%M%S_%{rotate-period}_%{interface}.raw.bind.pcap
+    restart: always
+    network_mode: host
+    volumes:
+     - type: bind
+       source: ./output/c-dns
+       target: /c-dns
+     - type: bind
+       source: ./docker-c-dns/compactor.conf
+       target: /etc/compactor.conf
+
+  # coredns-c-dns:
+  #   image: c-dns:20201029
+  #   build: docker-c-dns/.
+  #   command: -c /etc/compactor.conf --dns-port 63 --interface docker0 --interface eth0 --interface lo --output /c-dns/%Y%m%d-%H%M%S_%{rotate-period}_%{interface}.coredns.cdns --raw-pcap /c-dns/%Y%m%d-%H%M%S_%{rotate-period}_%{interface}.raw.coredns.pcap
+  #   restart: always
+  #   network_mode: host
+  #   volumes:
+  #    - type: bind
+  #      source: ./output/c-dns
+  #      target: /c-dns
+  #    - type: bind
+  #      source: ./docker-c-dns/compactor.conf
+  #      target: /etc/compactor.conf
+
+  # bind-c-dns-presenter:
+  #   image: c-dns-presenter:20201029
+  #   build: docker-c-dns-presenter/.
+  #   restart: always
+  #   ports:
+  #     - "80:80/tcp"
+  #   # environment:
+  #   #   - APACHE_LOG_DIR=/dev/stdout
+  #   volumes:
+  #    - type: bind
+  #      source: ./docker-c-dns-presenter/hedgehog.yaml
+  #      target: /etc/hedgehog/hedgehog.yaml
+  #    - type: bind
+  #      source: ./docker-c-dns-presenter/hedgehog.conf
+  #      target: /etc/apache2/sites-enabled/hedgehog.conf
+
+  # bind-c-dns-presenter-db:
+  #   image: postgres:13
+  #   env_file: ./docker-c-dns-presenter/postgres.env
+  #   volumes:
+  #     - type: bind
+  #       source: ./docker-c-dns-presenter/data
+  #       target: /var/lib/postgresql/data
+
+  query-cannon:
+    image: query-cannon:20201104
+    build: docker-query-cannon/.
+    # command: 
+    volumes:
+    #  - type: bind
+    #    source: ./output/query-cannon
+    #    target: /tmp
+     - type: bind
+       source: ./docker-query-cannon/queries.txt
+       target: /etc/queries.txt
+    network_mode: host
+    shm_size: 10000M
+
+# #KNOT-UTILS - this will fail to start without a commnad presented - this is by design.  This has been included for the dns gun kxdpgun utility
+#   knot-utils:
+#     image: knot-utils:20201104
+#     build: docker-knot-utils/.
+#     # command: 
+#     volumes:
+#      - type: bind
+#        source: ./docker-knot-utils
+#        target: /docker-knot-utils
+#     network_mode: host
+#     # ulimits:
+#     #   memlock: -1
+#         # soft: 9999
+#         # hard: 9999
+
+#   tshark:
+#     image: toendeavour/tshark
+#     volumes:
+#      - type: bind
+#        source: ./output/c-dns
+#        target: /pcap
+     
+
+# secrets:
+#   corefile:
+#     file: ./docker-coredns/Corefile
+
