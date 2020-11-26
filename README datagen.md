@@ -1,6 +1,6 @@
 # Generate some data and visualise it in Kibana
 
-1. Startup 
+1. Startup DNS Server and Capture
 ```
 docker-compose -f dns-docker-compose.yml up -d
 ```
@@ -10,7 +10,7 @@ docker-compose -f dns-docker-compose.yml up -d
 docker-compose -f dns-docker-compose.yml run --entrypoint '/bin/bash -c' query-cannon 'cd /query-cannon/.env/bin/ && ./qcan fire -v 127.0.0.1 urlpara /etc/queries.txt 50 200'
 ```
 
-3. Stop
+3. StopDNS Server and Capture
 ```
 docker-compose -f dns-docker-compose.yml down -d
 ```
@@ -32,15 +32,39 @@ total 60588
  6016 -rwxrwxrwx 1 root root  6158835 Nov 24 23:17 20201124-121619_300_docker0-eth0-lo.raw.bind.pcap
 ```
 
-4. Convert from pcap to json (very slow)
-```
-docker-compose -f dns-docker-compose.yml run --entrypoint 'tshark' tshark -r /pcap/20201124-121119_300_docker0-eth0-lo.raw.bind.pcap -T ek > output/tshark/packets.json
-```
-
-5. bring up ELK and observe (very slow)
+5. Start ELK 
 ```
 docker-compose -f elk-docker-compose.yml up -d
 ```
 
-6. visit kibana http://localhost:5601
-(DNS overview dashboard = http://127.0.0.1:5601/app/dashboards#/view/65120940-1454-11e9-9de0-f98d1808db8e-ecs?_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:now-15m,to:now))&_a=(description:'Overview%20of%20DNS%20request%20and%20response%20metrics.',filters:!(),fullScreenMode:!f,options:(darkTheme:!f,hidePanelTitles:!f,useMargins:!t),query:(language:kuery,query:''),timeRestore:!f,title:'%5BPacketbeat%5D%20DNS%20Overview%20ECS',viewMode:view))
+First time you run it you need to have a line uncommented for packetbeat - this created the dashboards in Kabana elk-docker-compose.yml
+```
+    command: setup -E setup.kibana.host=kibana:5601 # - this only needs to run the first time
+```
+
+```
+[root@DESKTOP-PK9PDHG dnsmetricslab]# docker-compose -f elk-docker-compose.yml run packetbeat
+Creating dnsmetricslab_packetbeat_run ... done
+Overwriting ILM policy is disabled. Set `setup.ilm.overwrite: true` for enabling.
+
+Index setup finished.
+Loading dashboards (Kibana must be running and reachable)
+Loaded dashboards
+```
+
+Now comment out that line -  elk-docker-compose.yml
+```
+    command: setup -E setup.kibana.host=kibana:5601 # - this only needs to run the first time
+```
+
+
+4. Injest pcap directly
+```
+docker-compose -f elk-docker-compose.yml run packetbeat -I /output/c-dns/20201116-230507_300_docker0-eth0-lo.raw.bind.pcap
+```
+
+5. visit kibana http://localhost:5601
+
+6. Create Index Pattern for packetbeat-7.9.3-* 
+
+7. DNS overview dashboard = http://localhost:5601/app/dashboards#/view/65120940-1454-11e9-9de0-f98d1808db8e-ecs?_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:now-15m,to:now))&_a=(description:'Overview%20of%20DNS%20request%20and%20response%20metrics.',filters:!(),fullScreenMode:!f,options:(darkTheme:!f,hidePanelTitles:!f,useMargins:!t),query:(language:kuery,query:''),timeRestore:!f,title:'%5BPacketbeat%5D%20DNS%20Overview%20ECS',viewMode:view)

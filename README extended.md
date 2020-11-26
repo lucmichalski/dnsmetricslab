@@ -7,6 +7,22 @@ sudo sysctl -w vm.max_map_count=262144
 ```
 
 
+You may end up with some permissions issues with when using wsl.  Following these steps may help.  It uses metadata to store permissions rather than using global defaults.
+https://github.com/microsoft/WSL/issues/4101
+```
+# vim /etc/wsl.conf
+[automount]
+enabled = true
+root = /mnt/
+options = "metadata,umask=22,fmask=11"
+```
+
+Then shutdown and wsl and restart it
+```
+wsl --shutdown
+```
+
+
 
 ## Setup ELK
 
@@ -16,6 +32,12 @@ docker-compose -f elk-docker-compose.yml up -d
 ```
 
 ## Setup Packetbeat
+### References
+https://www.elastic.co/guide/en/beats/packetbeat/current/command-line-options.html
+There is already a tool in the Elastic Stack to index network data into Elasticsearch: Packetbeat. Packetbeat can be configured to capture network packets live as well as read packets from a capture file with the -I option. It can recognize and parse a number of application-level protocols such as HTTP, MySQL and DNS, as well as general flow information. However, it is not built for full packet capture and parsing of the myriad different protocols out in the world and is best used for monitoring specific applications. Especially its ability to match responses with their original requests and indexing the merged event is very useful if you’re looking at specific protocols.
+
+
+### Run
 You will need to uncomment ELK containers if you would like this to run.
 
 If running ELK then after containers launched for first time comment this line out of elk-docker-compose.yml
