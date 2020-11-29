@@ -4,16 +4,17 @@ services:
 
   packetbeat:
     image: docker.elastic.co/beats/packetbeat:7.9.3
-    # command: setup -E setup.kibana.host=kibana:5601 # - this only needs to run the first time
+    command: setup -E setup.kibana.host=kibana:5601 # - this only needs to run the first time
     environment: 
       - output.elasticsearch.hosts=["elasticsearch:9200"] 
+      - ELASTICSEARCH_HOSTS=elasticsearch:9200
     cap_add:
       - ALL
     # network_mode: host
     volumes:
       - type: bind
         source: ./docker-elk/packetbeat.yml
-        target: /usr/share/packetbeat.yml
+        target: /usr/share/packetbeat/packetbeat.yml
         read_only: true
       - type: bind
         source: ./output/pcap
@@ -22,6 +23,10 @@ services:
       - type: bind
         source: ./output/c-dns
         target: /output/c-dns
+        read_only: false
+      - type: bind
+        source: ./output/pcap
+        target: /usr/share/packetbeat/output/pcap
         read_only: false
     depends_on:
       - elasticsearch
@@ -34,7 +39,7 @@ services:
       - "9200:9200/tcp"
     environment: 
       - discovery.type=single-node
-      - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
+      - ES_JAVA_OPTS=-Xms1024m -Xmx1024m
       - cluster.name=dnsmetricslab
     ulimits:
       nofile:
@@ -44,6 +49,10 @@ services:
       - type: bind
         source: ./docker-elk/data
         target: /usr/share/elasticsearch/data
+      # - type: bind
+      #   source: ./docker-elk/elasticsearch.yml
+      #   target: /usr/share/elasticsearch/config/elasticsearch.yml
+      #   read_only: false
 
   kibana:
     image: docker.elastic.co/kibana/kibana:7.9.3

@@ -63,6 +63,10 @@ Now comment out that line -  elk-docker-compose.yml
 docker-compose -f elk-docker-compose.yml run packetbeat -I /output/c-dns/20201116-230507_300_docker0-eth0-lo.raw.bind.pcap
 ```
 
+
+find ./output/pcap -name *bz2 -exec bzip2 -d "{}" \; find ./output/pcap -name *pcap -exec docker-compose -f elk-docker-compose.yml run packetbeat -I "{}" \;
+
+
 5. visit kibana http://localhost:5601
 
 6. Create Index Pattern for packetbeat-7.9.3-* 

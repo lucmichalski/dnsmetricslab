@@ -234,3 +234,20 @@ curl -X PUT "localhost:9200/_template/packets?pretty" -H 'Content-Type: applicat
 }
 '
 ```
+## ELK Errors
+If you see errors regarding locks then it may relate to an unclean shutdown of ES at some point.
+
+Deleting the lock files may help
+```
+ [root@DESKTOP-PK9PDHG docker-elk]# find . -name *lock*
+./data/nodes/0/indices/-u96HPuqRsqbOBsl6QHmzw/0/index/write.lock
+./data/nodes/0/indices/-vGe8Q41QZSRK7qlvJpsWA/0/index/write.lock
+./data/nodes/0/indices/4dv3jNEwQXu6FeW1ezmCRw/0/index/write.lock
+./data/nodes/0/indices/9fGwQN0KSt6iPHfdYYcJmw/0/index/write.lock
+./data/nodes/0/indices/eLXerlJ_TjWtr3Jr077ccA/0/index/write.lock
+./data/nodes/0/indices/sJiL_-hhSO2dBZZJK8bDdg/0/index/write.lock
+./data/nodes/0/indices/xpJhKoUDRLmHaLsUl8NVyw/0/index/write.lock
+./data/nodes/0/indices/yFIFW3qoSaKlJZ-mZz1-xA/0/index/write.lock
+./data/nodes/0/node.lock
+./data/nodes/0/_state/write.lock
+```
