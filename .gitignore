@@ -23,3 +23,8 @@ docker-c-dns-presenter/data/*
 !docker-c-dns-presenter/data/.initalised
 
 docker-elk/data
+
+docker-dnszeppelin-clickhouse/data/*
+docker-dnszeppelin-clickhouse/data/.initalised
+
+tmp

@@ -1,0 +1,17 @@
+sudo: required
+language: go
+
+go:
+  - 1.8
+  - 1.9
+  - tip
+
+install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -y libpcap0.8 libpcap0.8-dev libnuma-dev
+
+script:
+  - sudo -E env "PATH=$PATH" sh test.sh
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)

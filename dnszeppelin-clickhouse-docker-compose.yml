@@ -1,0 +1,55 @@
+version: '2'
+services:
+  clickhouse:
+    build: ./docker-dnszeppelin-clickhouse/docker/clickhouse
+    ports:
+      - 8123:8123
+      - 9000:9000
+    volumes:
+      - clickhouse_volume:/var/lib/clickhouse
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+  dnszeppelin:
+    build:
+      context: ./docker-dnszeppelin-clickhouse
+      dockerfile: docker/dnszeppelin-clickhouse/Dockerfile
+    command: ["sh", "-c", "go-wrapper run -devName=$DEV -clickhouseAddress clickhouse:9000"]
+    volumes:
+      - type: bind
+        source: ./output/pcap
+        target: /pcap
+        read_only: false
+      - type: bind
+        source: ./output/pcap
+        target: /go/src/app/pcap
+        read_only: false
+  mysql:
+    image: mysql:5
+    # volumes:
+    #   - type: bind
+    #     source: /home/ec2-user/zabbix/data
+    #     target: /var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=vgBbr12mIaVEvU0IyqDV
+      - MYSQL_DATABASE=grafana
+      - MYSQL_USER=grafana
+      - MYSQL_PASSWORD=RsrXgcLlrjvBsWijMKx0
+  grafana:
+    restart: always
+    image: grafana/grafana:latest
+    ports:
+     - "3000:3000/tcp"
+    environment:
+     - GF_INSTALL_PLUGINS=grafana-piechart-panel,vertamedia-clickhouse-datasource
+     - GF_SERVER_PROTOCOL=http
+     - GF_DATABASE_HOST=mysql
+     - GF_DATABASE_USER=grafana
+     - GF_DATABASE_NAME=grafana
+     - GF_DATABASE_TYPE=mysql
+     - GF_DATABASE_PASSWORD=RsrXgcLlrjvBsWijMKx0
+     - GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=grafana-piechart-panel,vertamedia-clickhouse-datasource
+volumes:
+  clickhouse_volume:
+    driver: local
